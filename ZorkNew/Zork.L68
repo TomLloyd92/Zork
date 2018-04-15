@@ -1,0 +1,1215 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 14/04/2018 17:09:15
+
+00001000                             1      org $1000
+00001000                             2  
+00001000                             3  *Created By:     Tom Lloyd
+00001000                             4  *Student Number: c00231308
+00001000                             5  *
+00001000                             6  *
+00001000                             7  *
+00001000                             8  *-------------------------------------------------------
+00001000                             9  *Choose to be Evil Wizard or New Romancers
+00001000                            10  *-------------------------------------------------------
+00001000                            11  
+00001000                            12  *-------------------------------------------------------
+00001000                            13  *Validation values to be used, modify as needed
+00001000                            14  *Add additional validation values as required
+00001000                            15  *-------------------------------------------------------
+00001000  =00000000                 16  exit        EQU 0      used to exit assembly program
+00001000  =00000064                 17  min_feed    EQU 100    min feed requirement
+00001000  =00000001                 18  min_horses  EQU 1      min number of horses
+00001000  =00000009                 19  max_horses  EQU 9      max number of horses
+00001000  =00000006                 20  min_soldier EQU 6      min soldiers
+00001000  =00000001                 21  min_charge  EQU 1      min rate of fuel use based of speed (oats for horses)
+00001000  =00000005                 22  max_charge  EQU 5      max rate e.g. Flank       
+00001000  =00000005                 23  hit_point   EQU 5      points accumilated on castle (objective) strike
+00001000  =00000008                 24  miss_point  EQU 8      points deducted for ordinace miss
+00001000                            25  
+00001000  =00000064                 26  mine_loc    EQU 100    example for a hit
+00001000                            27  
+00001000                            28  
+00001000                            29  *Start of Game
+00001000                            30  start:
+00001000  11FC 0064 4000            31      move.b  #100,$4000 put score/health in memory location $4000
+00001006  47F8 4000                 32      lea     $4000,A3   assign address A3 to that memory location    
+0000100A                            33      
+0000100A  6100 1FF4                 34      bsr     NEWGAME    Branch to new game   
+0000100E                            35      
+0000100E  6100 2164                 36      bsr     welcome    branch to the welcome subroutine 
+00001012  6100 2176                 37      bsr     input      branch to the input subroutine 
+00001016  6100 2152                 38      bsr     game       branch to the game subroutine
+0000101A                            39  *Game loop
+00003000                            40      org     $3000      the rest of the program is to be located from 3000 onwards
+00003000                            41  
+00003000                            42  
+00003000                            43   *-----------------------------------------*
+00003000                            44   *-----------GAME STARTS HERE--------------*
+00003000                            45   *-----------------------------------------*
+00003000                            46  
+00003000                            47  
+00003000                            48  NEWGAME
+00003000                            49     
+00003000  D9FC 000003E8             50      ADD.l     #1000,A4              Current Feed
+00003006                            51      
+00003006                            52     
+00003006  43F9 00003A10             53      LEA     Opening_msg,A1          Load beginning Message Introducing the player to the game
+0000300C  103C 000E                 54      MOVE.B  #14,D0                  Load beginning Message  
+00003010  4E4F                      55      TRAP    #15                     Display beginning Message     
+00003012                            56      
+00003012  103C 0004                 57      MOVE.B  #4,D0                   Place 4 for trap to call
+00003016  4E4F                      58      TRAP    #15                     User Unput number
+00003018  B2BC 00000001             59      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+0000301E  6700 033E                 60      BEQ     OgBeginning             If 1 was selected branch to Og beginning
+00003022                            61     
+00003022  B2BC 00000002             62      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+00003028  6700 04F8                 63      BEQ     TBBeginning             If 2 was input branch to TB beginning
+0000302C                            64  
+0000302C  B23C 0001                 65      CMP.B   #1,D1                   Compears D1 to 1
+00003030  6D00 000A                 66      BLT     INVALID                 If it is less than it is invalid, branch to Invalid    
+00003034  B23C 0002                 67      CMP.B   #2,D1                   Compears the number to 2
+00003038  6E00 0002                 68      BGT     INVALID                 Branches to Invalid
+0000303C                            69              
+0000303C                            70  
+0000303C  43F9 00004FBA             71  INVALID LEA     INV,A1              Put Invalid into A1
+00003042  103C 000E                 72          MOVE.B  #14,D0              14 into D0
+00003046  4E4F                      73          TRAP    #15                 Trap 15 Display the message in A1
+00003048  60B6                      74          BRA     NEWGAME             Branch to Start
+0000304A                            75          
+0000304A  43F9 00004FBA             76  INVALIDOG1 LEA     INV,A1           Put Invalid into A1
+00003050  103C 000E                 77          MOVE.B  #14,D0              14 into D0
+00003054  4E4F                      78          TRAP    #15                 Trap 15 Display the message in A1
+00003056  6000 0306                 79          BRA     OgBeginning         
+0000305A                            80          
+0000305A  43F9 00004FBA             81  INVALIDOG2 LEA     INV,A1           Put Invalid into A1
+00003060  103C 000E                 82          MOVE.B  #14,D0              14 into D0
+00003064  4E4F                      83          TRAP    #15                 Trap 15 Display the message in A1
+00003066  6000 032C                 84          BRA     OgSideEntrance      
+0000306A                            85          
+0000306A  43F9 00004FBA             86  INVALIDOG3 LEA     INV,A1           Put Invalid into A1
+00003070  103C 000E                 87          MOVE.B  #14,D0              14 into D0
+00003074  4E4F                      88          TRAP    #15                 Trap 15 Display the message in A1
+00003076  6000 0352                 89          BRA     OgMainGate     
+0000307A                            90          
+0000307A  43F9 00004FBA             91  INVALIDOG4 LEA     INV,A1           Put Invalid into A1
+00003080  103C 000E                 92          MOVE.B  #14,D0              14 into D0
+00003084  4E4F                      93          TRAP    #15                 Trap 15 Display the message in A1
+00003086  6000 0378                 94          BRA     OgThroneRoom    
+0000308A                            95          
+0000308A  43F9 00004FBA             96  INVALIDOG5 LEA     INV,A1           Put Invalid into A1
+00003090  103C 000E                 97          MOVE.B  #14,D0              14 into D0
+00003094  4E4F                      98          TRAP    #15                 Trap 15 Display the message in A1
+00003096  6000 039E                 99          BRA     OGSoldiers        
+0000309A                           100          
+0000309A  43F9 00004FBA            101  INVALIDOG6 LEA     INV,A1           Put Invalid into A1
+000030A0  103C 000E                102          MOVE.B  #14,D0              14 into D0
+000030A4  4E4F                     103          TRAP    #15                 Trap 15 Display the message in A1
+000030A6  6000 03C0                104          BRA     OgHeavyAttack             
+000030AA                           105          
+000030AA  43F9 00004FBA            106  INVALIDOG7 LEA     INV,A1           Put Invalid into A1
+000030B0  103C 000E                107          MOVE.B  #14,D0              14 into D0
+000030B4  4E4F                     108          TRAP    #15                 Trap 15 Display the message in A1
+000030B6  6000 03DC                109          BRA     OgFastAttack            
+000030BA                           110  
+000030BA  43F9 00004FBA            111  INVALIDOG8 LEA     INV,A1           Put Invalid into A1
+000030C0  103C 000E                112          MOVE.B  #14,D0              14 into D0
+000030C4  4E4F                     113          TRAP    #15                 Trap 15 Display the message in A1
+000030C6  6000 0402                114          BRA     OgSpare     
+000030CA                           115  
+000030CA  43F9 00004FBA            116  INVALIDOG9 LEA     INV,A1           Put Invalid into A1
+000030D0  103C 000E                117          MOVE.B  #14,D0              14 into D0
+000030D4  4E4F                     118          TRAP    #15                 Trap 15 Display the message in A1
+000030D6  6000 041E                119          BRA     OgKill   
+000030DA                           120          
+000030DA  43F9 00004FBA            121  INVALIDTB1 LEA     INV,A1           Put Invalid into A1
+000030E0  103C 000E                122          MOVE.B  #14,D0              14 into D0
+000030E4  4E4F                     123          TRAP    #15                 Trap 15 Display the message in A1
+000030E6  6000 043A                124          BRA     TBBeginning
+000030EA                           125          
+000030EA  43F9 00004FBA            126  INVALIDTB2 LEA     INV,A1           Put Invalid into A1
+000030F0  103C 000E                127          MOVE.B  #14,D0              14 into D0
+000030F4  4E4F                     128          TRAP    #15                 Trap 15 Display the message in A1
+000030F6  6000 0460                129          BRA     TBFront
+000030FA                           130          
+000030FA  43F9 00004FBA            131  INVALIDTB3 LEA     INV,A1           Put Invalid into A1
+00003100  103C 000E                132          MOVE.B  #14,D0              14 into D0
+00003104  4E4F                     133          TRAP    #15                 Trap 15 Display the message in A1
+00003106  6000 0486                134          BRA     TBBack        
+0000310A                           135  
+0000310A  43F9 00004FBA            136  INVALIDTB4 LEA     INV,A1           Put Invalid into A1
+00003110  103C 000E                137          MOVE.B  #14,D0              14 into D0
+00003114  4E4F                     138          TRAP    #15                 Trap 15 Display the message in A1
+00003116  6000 04AC                139          BRA     TBStartFire
+0000311A                           140          
+0000311A  43F9 00004FBA            141  INVALIDTB5 LEA     INV,A1           Put Invalid into A1
+00003120  103C 000E                142          MOVE.B  #14,D0              14 into D0
+00003124  4E4F                     143          TRAP    #15                 Trap 15 Display the message in A1
+00003126  6000 04D2                144          BRA     TBConfront
+0000312A                           145          
+0000312A  43F9 00004FBA            146  INVALIDTB6 LEA     INV,A1           Put Invalid into A1
+00003130  103C 000E                147          MOVE.B  #14,D0              14 into D0
+00003134  4E4F                     148          TRAP    #15                 Trap 15 Display the message in A1
+00003136  6000 04F8                149          BRA     TBRetreat
+0000313A                           150  
+0000313A  43F9 00004FBA            151  INVALIDTB7 LEA     INV,A1           Put Invalid into A1
+00003140  103C 000E                152          MOVE.B  #14,D0              14 into D0
+00003144  4E4F                     153          TRAP    #15                 Trap 15 Display the message in A1
+00003146  6000 0514                154          BRA     TBThrone
+0000314A                           155          
+0000314A  43F9 00004FBA            156  INVALIDTB8 LEA     INV,A1           Put Invalid into A1
+00003150  103C 000E                157          MOVE.B  #14,D0              14 into D0
+00003154  4E4F                     158          TRAP    #15                 Trap 15 Display the message in A1
+00003156  6000 053A                159          BRA     TBHeavy
+0000315A                           160   
+0000315A  43F9 00004FBA            161  INVALIDTB9 LEA     INV,A1           Put Invalid into A1
+00003160  103C 000E                162          MOVE.B  #14,D0              14 into D0
+00003164  4E4F                     163          TRAP    #15                 Trap 15 Display the message in A1
+00003166  6000 0556                164          BRA     TBSmall
+0000316A                           165  
+0000316A                           166  
+0000316A                           167  
+0000316A                           168  
+0000316A                           169  *-------------------------------------------------------
+0000316A                           170  *-------------------Game Subroutine---------------------
+0000316A                           171  *-------------------------------------------------------
+0000316A                           172  game:
+0000316A  6100 0034                173      bsr     gameloop   branch to gameloop subroutine
+0000316E  4E75                     174      rts                return from game: subroutine
+00003170                           175            
+00003170                           176  end:
+00003170  FFFF FFFF                177      simhalt
+00003174                           178  
+00003174                           179  *-------------------------------------------------------
+00003174                           180  *-------------------Welcome Subroutine------------------
+00003174                           181  *-------------------------------------------------------
+00003174                           182  welcome:
+00003174  6100 01D2                183      bsr     endl            branch to endl subroutine
+00003178  43F9 000036ED            184      lea     welcome_msg,A1  assign message to address register A1
+0000317E  103C 000E                185      move.b  #14,D0          move literal 14 to DO
+00003182  4E4F                     186      trap    #15             trap and interpret value in D0
+00003184  6100 01C2                187      bsr     endl            branch to endl subroutine
+00003188  4E75                     188      rts                     return from welcome: subroutine
+0000318A                           189  
+0000318A                           190  *-------------------------------------------------------
+0000318A                           191  *---------Gameplay Input Values Subroutine--------------
+0000318A                           192  *-------------------------------------------------------    
+0000318A                           193  input:
+0000318A  6100 0072                194      bsr     feed            branch to feed input subroutine
+0000318E  6100 0088                195      bsr     horses          branch to ship input subroutine
+00003192  6100 009E                196      bsr     rate            branch to rate (charging speed) input subroutine
+00003196  6100 00B4                197      bsr     distance        branch to mission distance/location input subroutine
+0000319A  6100 00CA                198      bsr     soldiers        branch to soldiers input subroutine
+0000319E  4E75                     199      rts
+000031A0                           200  
+000031A0                           201  *-------------------------------------------------------
+000031A0                           202  *----------------Gameloop (main loop)-------------------
+000031A0                           203  *------------------------------------------------------- 
+000031A0                           204  gameloop:
+000031A0  6100 0028                205      bsr     update          branch to update game subroutine 
+000031A4  6100 0174                206      bsr     clear_screen    clears the screen         
+000031A8  6100 003A                207      bsr     draw            branch to draw screen subroutine
+000031AC  6100 016C                208      bsr     clear_screen    clears the screen
+000031B0  6100 00CE                209      bsr     gameplay        branch to gameplay subroutine
+000031B4  6100 0164                210      bsr     clear_screen    clears the screen
+000031B8  6100 00E4                211      bsr     hud             branch to display HUD subroutine
+000031BC  6100 015C                212      bsr     clear_screen    clears the screen
+000031C0  6100 0164                213      bsr     replay          branch to replay game subroutine
+000031C4  6100 0154                214      bsr     clear_screen    clears the screen
+000031C8  4E75                     215      rts                     return from gameloop: subroutine
+000031CA                           216  
+000031CA                           217  *-------------------------------------------------------
+000031CA                           218  *---------------Update Mission Progress-----------------
+000031CA                           219  *  Move to battle location, engage enemy, fire and take
+000031CA                           220  *  fire, complete mission and return to base
+000031CA                           221  *------------------------------------------------------- 
+000031CA                           222  update:
+000031CA  6100 017C                223      bsr     endl            print a CR and LF
+000031CE  6100 012C                224      bsr     decorate        decorate with dots using a loop
+000031D2  43F9 000039A9            225      lea     update_msg,A1   
+000031D8  103C 000E                226      move.b  #14,D0
+000031DC  4E4F                     227      trap    #15
+000031DE  6100 011C                228      bsr     decorate
+000031E2  4E75                     229      rts
+000031E4                           230      
+000031E4                           231  *-------------------------------------------------------
+000031E4                           232  *---------------Draw Mission Updates--------------------
+000031E4                           233  * Draw the game progress information, status regarding
+000031E4                           234  * mission
+000031E4                           235  *------------------------------------------------------- 
+000031E4                           236  draw:
+000031E4  6100 0162                237      bsr     endl
+000031E8  6100 0112                238      bsr     decorate
+000031EC  43F9 000039BB            239      lea     draw_msg,A1
+000031F2  103C 000E                240      move.b  #14,D0
+000031F6  4E4F                     241      trap    #15
+000031F8  6100 0102                242      bsr     decorate
+000031FC  4E75                     243      rts
+000031FE                           244  *-------------------------------------------------------
+000031FE                           245  *-----------------------Horse feed-----------------------
+000031FE                           246  * Input the feed load for each horse. Feed costs money
+000031FE                           247  * For an advanced mark you need to manage this resource
+000031FE                           248  *------------------------------------------------------- 
+000031FE                           249  feed:
+000031FE  6100 0148                250      bsr     endl
+00003202  6100 00F8                251      bsr     decorate
+00003206  43F9 0000378F            252      lea     feed_msg,A1
+0000320C  103C 000E                253      move.b  #14,D0
+00003210  4E4F                     254      trap    #15
+00003212  6100 00E8                255      bsr     decorate
+00003216  4E75                     256      rts
+00003218                           257  
+00003218                           258  *-------------------------------------------------------
+00003218                           259  *--------------------Horses Inventory---------------------
+00003218                           260  * Number of horses to be allocated to a mission 
+00003218                           261  *------------------------------------------------------- 
+00003218                           262  horses:
+00003218  6100 012E                263      bsr     endl
+0000321C  6100 00DE                264      bsr     decorate
+00003220  43F9 000037DB            265      lea     horses_msg,A1
+00003226  103C 000E                266      move.b  #14,D0
+0000322A  4E4F                     267      trap    #15
+0000322C  6100 00CE                268      bsr     decorate
+00003230  4E75                     269      rts
+00003232                           270  
+00003232                           271  *-------------------------------------------------------
+00003232                           272  *-------------------Horse(s) Charge Speed---------------
+00003232                           273  * horses speed to and from a mission
+00003232                           274  *------------------------------------------------------- 
+00003232                           275  rate:
+00003232  6100 0114                276      bsr     endl
+00003236  6100 00C4                277      bsr     decorate
+0000323A  43F9 000037EF            278      lea     rate_msg,A1
+00003240  103C 000E                279      move.b  #14,D0
+00003244  4E4F                     280      trap    #15
+00003246  6100 00B4                281      bsr     decorate
+0000324A  4E75                     282      rts
+0000324C                           283  
+0000324C                           284  *-------------------------------------------------------
+0000324C                           285  *------------------Mission Distance---------------------
+0000324C                           286  * Distance to battle location
+0000324C                           287  *------------------------------------------------------- 
+0000324C                           288  distance:
+0000324C  6100 00FA                289      bsr     endl
+00003250  6100 00AA                290      bsr     decorate
+00003254  43F9 00003867            291      lea     distance_msg,A1
+0000325A  103C 000E                292      move.b  #14,D0
+0000325E  4E4F                     293      trap    #15
+00003260  6100 009A                294      bsr     decorate
+00003264  4E75                     295      rts
+00003266                           296  
+00003266                           297  *-------------------------------------------------------
+00003266                           298  *-----------------------Soldiers----------------------
+00003266                           299  * Number of soldiers
+00003266                           300  *-------------------------------------------------------   
+00003266                           301  soldiers:
+00003266  6100 00E0                302      bsr     endl
+0000326A  6100 0090                303      bsr     decorate
+0000326E  43F9 0000390D            304      lea     soldiers_msg,A1
+00003274  103C 000E                305      move.b  #14,D0
+00003278  4E4F                     306      trap    #15
+0000327A  6100 0080                307      bsr     decorate
+0000327E  4E75                     308      rts
+00003280                           309  
+00003280                           310  *-------------------------------------------------------
+00003280                           311  *---Game Play (Mission Progress, Battle Maneuvers)------
+00003280                           312  *------------------------------------------------------- 
+00003280                           313  gameplay:
+00003280  6100 00C6                314      bsr     endl
+00003284  6100 0076                315      bsr     decorate
+00003288  43F9 0000399A            316      lea     gameplay_msg,A1
+0000328E  103C 000E                317      move.b  #14,D0
+00003292  4E4F                     318      trap    #15
+00003294  6100 0066                319      bsr     decorate
+00003298  6100 0026                320      bsr     collision
+0000329C  4E75                     321      rts
+0000329E                           322  
+0000329E                           323  *-------------------------------------------------------
+0000329E                           324  *-----------------Heads Up Display (Score)--------------
+0000329E                           325  * Retrieves the score from memory location
+0000329E                           326  *-------------------------------------------------------   
+0000329E                           327  hud:
+0000329E                           328  
+0000329E  6100 00A8                329      bsr     endl
+000032A2  6100 0058                330      bsr     decorate
+000032A6  43F9 00003A07            331      lea     hud_msg,A1
+000032AC  103C 000E                332      move.b  #14,D0
+000032B0  4E4F                     333      trap    #15
+000032B2  1213                     334      move.b  (A3),D1     retrieve the value A3 point to and move to D1
+000032B4  103C 0003                335      move.b  #3,D0       move literal 3 to D0
+000032B8  4E4F                     336      trap    #15         intrepret value in D0, which 3 which displays D1
+000032BA  6100 0040                337      bsr     decorate
+000032BE  4E75                     338      rts
+000032C0                           339  
+000032C0                           340  *-------------------------------------------------------
+000032C0                           341  *-----------------------Taking Fire---------------------
+000032C0                           342  * This could be used for collision detection, if 
+000032C0                           343  *-------------------------------------------------------
+000032C0                           344  collision:
+000032C0  123C 0064                345      move.b  #mine_loc,D1
+000032C4  B27C 0064                346      cmp     #100,D1 is( x == 100)?
+000032C8  6600 0010                347      bne     collision_miss if x is equal to 100, then hit
+000032CC                           348  collision_hit:
+000032CC                           349      *hit
+000032CC  43F9 000039C9            350      lea     hit_msg,A1
+000032D2  303C 000E                351      move    #14,D0
+000032D6  4E4F                     352      trap    #15
+000032D8  4E75                     353      rts
+000032DA                           354      
+000032DA                           355  collision_miss:
+000032DA                           356      *miss
+000032DA  43F9 000039D1            357      lea     miss_msg,A1
+000032E0  303C 000E                358      move    #14,D0
+000032E4  4E4F                     359      trap    #15
+000032E6  4E75                     360      rts
+000032E8                           361  
+000032E8                           362  *-------------------------------------------------------
+000032E8                           363  *--------------------------Loop-------------------------
+000032E8                           364  *-------------------------------------------------------
+000032E8                           365  loop:
+000032E8  163C 0005                366      move.b  #5, D3 loop counter D3=5
+000032EC                           367  next:
+000032EC  43F9 000039D7            368      lea     loop_msg,A1
+000032F2  103C 000E                369      move.b  #14,D0
+000032F6  4E4F                     370      trap    #15
+000032F8  5343                     371      sub     #1,D3   decrement loop counter
+000032FA  66F0                     372      bne     next    repeat until D0=0
+000032FC                           373  
+000032FC                           374  *-------------------------------------------------------
+000032FC                           375  *------------------Screen Decoration--------------------
+000032FC                           376  *-------------------------------------------------------
+000032FC                           377  decorate:
+000032FC  163C 003C                378      move.b  #60, D3
+00003300  6100 0046                379      bsr     endl
+00003304                           380  out:
+00003304  43F9 000039D7            381      lea     loop_msg,A1
+0000330A  103C 000E                382      move.b  #14,D0
+0000330E  4E4F                     383      trap    #15
+00003310  5343                     384      sub     #1,D3   decrement loop counter
+00003312  66F0                     385      bne     out     repeat until D0=0
+00003314  6100 0032                386      bsr     endl
+00003318  4E75                     387      rts
+0000331A                           388      
+0000331A                           389  clear_screen: 
+0000331A  103C 000B                390      move.b  #11,D0      clear screen
+0000331E  323C FF00                391      move.w  #$ff00,D1
+00003322  4E4F                     392      trap    #15
+00003324  4E75                     393      rts
+00003326                           394  *-------------------------------------------------------
+00003326                           395  *------------------------Replay-------------------------
+00003326                           396  *-------------------------------------------------------
+00003326                           397  replay:
+00003326  6100 0020                398      bsr     endl
+0000332A  43F9 000039D9            399      lea     replay_msg,A1
+00003330  103C 000E                400      move.b  #14,D0
+00003334  4E4F                     401      trap    #15
+00003336                           402      
+00003336  103C 0004                403      move.b  #4,D0
+0000333A  4E4F                     404      trap    #15
+0000333C                           405  
+0000333C  B27C 0000                406      cmp     #exit,D1
+00003340  6700 FE2E                407      beq     end         if SR Z register contains 1 beq => Branch Equals
+00003344  6100 FE5A                408      bsr     gameloop
+00003348                           409  
+00003348                           410  endl:
+00003348  48E7 8040                411      movem.l D0/A1,-(A7)
+0000334C  303C 000E                412      move    #14,D0
+00003350  43F9 000036EA            413      lea     crlf,A1
+00003356  4E4F                     414      trap    #15
+00003358  4CDF 0201                415      movem.l (A7)+,D0/A1
+0000335C  4E75                     416      rts
+0000335E                           417      
+0000335E                           418  
+0000335E                           419   *-----------------------------------------------------*
+0000335E                           420   *------------------OGRIMMAR---------------------------*
+0000335E                           421   *-----------------------------------------------------*    
+0000335E                           422  
+0000335E                           423  OgBeginning:
+0000335E                           424      
+0000335E  43F9 00003BBD            425      LEA     Og_msg,A1               Load beggining Message Introducing the player to the game
+00003364  103C 000E                426      MOVE.B  #14,D0                  Load Beggining Message
+00003368  4E4F                     427      TRAP    #15                     Display begging message
+0000336A                           428  
+0000336A  103C 0004                429      MOVE.B  #4,D0                   Place 4 for trap to call
+0000336E  4E4F                     430      TRAP    #15                     User Input number
+00003370  B2BC 00000001            431      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+00003376  6700 0052                432      BEQ     OgMainGate              If 1 was selected branch to Main Gate
+0000337A                           433     
+0000337A  B2BC 00000002            434      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+00003380  6700 0012                435      BEQ     OgSideEntrance          If 2 was input branch to OG Side Entrance
+00003384                           436      
+00003384  B23C 0001                437      CMP.B   #1,D1                    Compears D1 to 1
+00003388  6D00 FCC0                438      BLT     INVALIDOG1                 If it is less than it is invalid, branch to Invalid    
+0000338C  B23C 0002                439      CMP.B   #2,D1                    Compears the number to 2
+00003390  6E00 FCB8                440      BGT     INVALIDOG1                 Branches to Invalid1
+00003394                           441  
+00003394                           442  OgSideEntrance:
+00003394                           443    
+00003394  43F9 00003CE7            444      LEA     OgSide_msg,A1           Side entrance text
+0000339A  103C 000E                445      MOVE.B  #14,D0                  Load Side Entrance Message
+0000339E  4E4F                     446      TRAP    #15                     Display Side Entance Message
+000033A0                           447  
+000033A0  103C 0004                448      MOVE.B  #4,D0                   Place 4 for trap to call
+000033A4  4E4F                     449      TRAP    #15                     User Input number
+000033A6  B2BC 00000001            450      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+000033AC  6700 0052                451      BEQ     OgThroneRoom            If 1 was selected branch Throne Room
+000033B0                           452     
+000033B0  B2BC 00000002            453      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+000033B6  6700 007E                454      BEQ     OgSoldiers              If 2 was input branch to Soldiers
+000033BA                           455  
+000033BA  B23C 0001                456      CMP.B   #1,D1                    Compears D1 to 1
+000033BE  6D00 FC9A                457      BLT     INVALIDOG2               If it is less than it is invalid, branch to Invalid    
+000033C2  B23C 0002                458      CMP.B   #2,D1                    Compears the number to 2
+000033C6  6E00 FC92                459      BGT     INVALIDOG2               Branches to Invalid1    
+000033CA                           460      
+000033CA                           461  OgMainGate:
+000033CA                           462    
+000033CA  43F9 00003E4F            463      LEA     OgMain_msg,A1           Main gate text
+000033D0  103C 000E                464      MOVE.B  #14,D0                  Load Beggining Message
+000033D4  4E4F                     465      TRAP    #15                     Display begging message
+000033D6                           466      
+000033D6  103C 0004                467      MOVE.B  #4,D0                   Place 4 for trap to call
+000033DA  4E4F                     468      TRAP    #15                     User Unput number
+000033DC  B2BC 00000001            469      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+000033E2  6700 001C                470      BEQ     OgThroneRoom            If 1 was selected branch Throne Room
+000033E6                           471     
+000033E6  B2BC 00000002            472      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+000033EC  6700 0048                473      BEQ     OgSoldiers              If 2 was input branch to Soldiers
+000033F0                           474      
+000033F0  B23C 0001                475      CMP.B   #1,D1                    Compears D1 to 1
+000033F4  6D00 FC74                476      BLT     INVALIDOG3               If it is less than it is invalid, branch to Invalid    
+000033F8  B23C 0002                477      CMP.B   #2,D1                    Compears the number to 2
+000033FC  6E00 FC6C                478      BGT     INVALIDOG3               Branches to Invalid1  
+00003400                           479  
+00003400                           480  OgThroneRoom:
+00003400  43F9 0000407F            481      LEA     OgThrone_msg,A1         Throne Room Text
+00003406  103C 000E                482      MOVE.B  #14,D0                  Load Throne Message
+0000340A  4E4F                     483      TRAP    #15                     Display Throne message
+0000340C                           484      
+0000340C  103C 0004                485      MOVE.B  #4,D0                   Place 4 for trap to call
+00003410  4E4F                     486      TRAP    #15                     User Input number
+00003412  B2BC 00000001            487      CMP.L   #1,D1                   Compare the number 1 to the number in D1
+00003418  6700 004E                488      BEQ     OgHeavyAttack           If 1 was selected Power attack
+0000341C                           489     
+0000341C  B2BC 00000002            490      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+00003422  6700 0070                491      BEQ     OgFastAttack            If 2 was input branch to Speed Attack
+00003426                           492      
+00003426  B23C 0001                493      CMP.B   #1,D1                    Compears D1 to 1
+0000342A  6D00 FC4E                494      BLT     INVALIDOG4               If it is less than it is invalid, branch to Invalid    
+0000342E  B23C 0002                495      CMP.B   #2,D1                    Compears the number to 2
+00003432  6E00 FC46                496      BGT     INVALIDOG4               Branches to Invalid1  
+00003436                           497  
+00003436                           498  OGSoldiers:
+00003436  43F9 00003F90            499      LEA     OgSoldiers_msg,A1       Soldiers Text
+0000343C  103C 000E                500      MOVE.B  #14,D0                  Load soldiers Message
+00003440  4E4F                     501      TRAP    #15                     Display soldiers message
+00003442                           502      
+00003442  103C 0004                503      MOVE.B  #4,D0                   Place 4 for trap to call
+00003446  4E4F                     504      TRAP    #15                     User Input number
+00003448  B2BC 00000001            505      CMP.L   #1,D1                   Compare the number 1 to the number in D1
+0000344E  67B0                     506      BEQ     OgThroneRoom            If 1 was selected Go to the throne room
+00003450                           507     
+00003450  B2BC 00000002            508      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+00003456  67A8                     509      BEQ     OgThroneRoom            If 2 was input branch to Throne room
+00003458                           510      
+00003458  B23C 0001                511      CMP.B   #1,D1                    Compears D1 to 1
+0000345C  6D00 FC2C                512      BLT     INVALIDOG5               If it is less than it is invalid, branch to Invalid    
+00003460  B23C 0002                513      CMP.B   #2,D1                    Compears the number to 2
+00003464  6E00 FC24                514      BGT     INVALIDOG5               Branches to Invalid1 
+00003468                           515  
+00003468                           516  
+00003468                           517  OgHeavyAttack:
+00003468  43F9 00004179            518      LEA     OgHeavyAttack_msg,A1    Heavy Attack Text
+0000346E  103C 000E                519      MOVE.B  #14,D0                  Load Heavy Attack Message
+00003472  4E4F                     520      TRAP    #15                     Display Heavy Attack message
+00003474                           521      
+00003474  103C 0004                522      MOVE.B  #4,D0                   Place 4 for trap to call
+00003478  4E4F                     523      TRAP    #15                     User Input number
+0000347A  B2BC 00000001            524      CMP.L   #1,D1                   Compare the number 1 to the number in D1
+00003480  6700 FB7E                525      BEQ     NEWGAME                 If 1 was selected Go to new Game
+00003484                           526      
+00003484  B23C 0001                527      CMP.B   #1,D1                    Compears D1 to 1
+00003488  6D00 FC10                528      BLT     INVALIDOG6               If it is less than it is invalid, branch to Invalid    
+0000348C  B23C 0002                529      CMP.B   #2,D1                    Compears the number to 2
+00003490  6E00 FC08                530      BGT     INVALIDOG6               Branches to Invalid1 
+00003494                           531  
+00003494                           532  
+00003494                           533  OgFastAttack:
+00003494  43F9 000042CF            534      LEA     OgFastAttack_msg,A1     Fast Attack Text
+0000349A  103C 000E                535      MOVE.B  #14,D0                  Load Fast Attack Message
+0000349E  4E4F                     536      TRAP    #15                     Display Fast Attack message
+000034A0                           537      
+000034A0  103C 0004                538      MOVE.B  #4,D0                   Place 4 for trap to call
+000034A4  4E4F                     539      TRAP    #15                     User Input number
+000034A6  B2BC 00000001            540      CMP.L   #1,D1                   Compare the number 1 to the number in D1
+000034AC  6700 001C                541      BEQ     OgSpare                 If 1 was selected Go to OgSpare
+000034B0                           542  
+000034B0  B2BC 00000002            543      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+000034B6  6700 003E                544      BEQ     OgKill                  If 2 was input branch to Kill
+000034BA                           545      
+000034BA  B23C 0001                546      CMP.B   #1,D1                    Compears D1 to 1
+000034BE  6D00 FBEA                547      BLT     INVALIDOG7               If it is less than it is invalid, branch to Invalid    
+000034C2  B23C 0002                548      CMP.B   #2,D1                    Compears the number to 2
+000034C6  6E00 FBE2                549      BGT     INVALIDOG7               Branches to Invalid1 
+000034CA                           550      
+000034CA                           551  
+000034CA                           552  OgSpare
+000034CA  43F9 000043D6            553      LEA     OgSpare_msg,A1          Spare Text
+000034D0  103C 000E                554      MOVE.B  #14,D0                  Load Fast Spare  Message
+000034D4  4E4F                     555      TRAP    #15                     Display Spare message
+000034D6                           556      
+000034D6  103C 0004                557      MOVE.B  #4,D0                   Place 4 for trap to call
+000034DA  4E4F                     558      TRAP    #15                     User Input number
+000034DC  B2BC 00000001            559      CMP.L   #1,D1                   Compare the number 1 to the number in D1
+000034E2  6700 FB1C                560      BEQ     NEWGAME                 If 1 was selected Go to New game
+000034E6                           561      
+000034E6  B23C 0001                562      CMP.B   #1,D1                    Compears D1 to 1
+000034EA  6D00 FBCE                563      BLT     INVALIDOG8               If it is less than it is invalid, branch to Invalid    
+000034EE  B23C 0002                564      CMP.B   #2,D1                    Compears the number to 2
+000034F2  6E00 FBC6                565      BGT     INVALIDOG8               Branches to Invalid1 
+000034F6                           566      
+000034F6                           567      
+000034F6                           568      
+000034F6                           569  OgKill
+000034F6  43F9 000044FE            570      LEA     OgKill_msg,A1           Kill Text
+000034FC  103C 000E                571      MOVE.B  #14,D0                  Load Kill Message
+00003500  4E4F                     572      TRAP    #15                     Display Kill message
+00003502                           573      
+00003502  103C 0004                574      MOVE.B  #4,D0                   Place 4 for trap to call
+00003506  4E4F                     575      TRAP    #15                     User Input number
+00003508  B2BC 00000001            576      CMP.L   #1,D1                   Compare the number 1 to the number in D1
+0000350E  6700 FAF0                577      BEQ     NEWGAME                 If 1 was selected Go to New game
+00003512                           578  
+00003512  B23C 0001                579      CMP.B   #1,D1                    Compears D1 to 1
+00003516  6D00 FBB2                580      BLT     INVALIDOG9               If it is less than it is invalid, branch to Invalid    
+0000351A  B23C 0001                581      CMP.B   #1,D1                    Compears the number to 2
+0000351E  6E00 FBAA                582      BGT     INVALIDOG9               Branches to Invalid1 
+00003522                           583  
+00003522                           584  
+00003522                           585   *-----------------------------------------------------*
+00003522                           586   *------------------THUNDER BLUFF----------------------*
+00003522                           587   *-----------------------------------------------------*
+00003522                           588  TBBeginning
+00003522                           589      
+00003522  43F9 00004E96            590      LEA     TB_msg,A1               Load beggining Message Introducing the player to the game
+00003528  103C 000E                591      MOVE.B  #14,D0                  Load Beggining Message
+0000352C  4E4F                     592      TRAP    #15                     Display begging message
+0000352E                           593      
+0000352E  103C 0004                594      MOVE.B  #4,D0                   Place 4 for trap to call
+00003532  4E4F                     595      TRAP    #15                     User Input number
+00003534  B2BC 00000001            596      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+0000353A  6700 001C                597      BEQ     TBFront                 If 1 was selected branch to Main Gate
+0000353E                           598     
+0000353E  B2BC 00000002            599      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+00003544  6700 0048                600      BEQ     TBBack                  If 2 was input branch to OG Side Entrance
+00003548                           601      
+00003548  B23C 0001                602      CMP.B   #1,D1                    Compears D1 to 1
+0000354C  6D00 FB8C                603      BLT     INVALIDTB1               If it is less than it is invalid, branch to Invalid    
+00003550  B23C 0002                604      CMP.B   #2,D1                    Compears the number to 2
+00003554  6E00 FB84                605      BGT     INVALIDTB1               Branches to Invalid1 
+00003558                           606          
+00003558                           607  TBFront
+00003558                           608    
+00003558  43F9 00004640            609      LEA     TbFront_msg,A1          Load Front MEssage
+0000355E  103C 000E                610      MOVE.B  #14,D0                  Move 14 into D0 Front Message
+00003562  4E4F                     611      TRAP    #15                     Display begging message with trap 15
+00003564                           612      
+00003564  103C 0004                613      MOVE.B  #4,D0                   Place 4 for trap to call
+00003568  4E4F                     614      TRAP    #15                     User Input number
+0000356A  B2BC 00000001            615      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+00003570  6700 0052                616      BEQ     TBStartFire             If 1 was selected branch to
+00003574                           617     
+00003574  B2BC 00000002            618      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+0000357A  6700 007E                619      BEQ     TBConfront              If 2 was input branch to   
+0000357E                           620  
+0000357E  B23C 0001                621      CMP.B   #1,D1                    Compears D1 to 1
+00003582  6D00 FB66                622      BLT     INVALIDTB2               If it is less than it is invalid, branch to Invalid    
+00003586  B23C 0002                623      CMP.B   #2,D1                    Compears the number to 2
+0000358A  6E00 FB5E                624      BGT     INVALIDTB2               Branches to Invalid1  
+0000358E                           625  
+0000358E                           626  TBBack
+0000358E  43F9 0000472B            627      LEA     TbBack_msg,A1           Load Front MEssage
+00003594  103C 000E                628      MOVE.B  #14,D0                  Move 14 into D0 Front Message
+00003598  4E4F                     629      TRAP    #15                     Display begging message with trap 15
+0000359A                           630      
+0000359A  103C 0004                631      MOVE.B  #4,D0                   Place 4 for trap to call
+0000359E  4E4F                     632      TRAP    #15                     User Input number
+000035A0  B2BC 00000001            633      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+000035A6  6700 001C                634      BEQ     TBStartFire             If 1 was selected branch to
+000035AA                           635     
+000035AA  B2BC 00000002            636      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+000035B0  6700 0048                637      BEQ     TBConfront              If 2 was input branch to  
+000035B4                           638  
+000035B4  B23C 0001                639      CMP.B   #1,D1                    Compears D1 to 1
+000035B8  6D00 FB40                640      BLT     INVALIDTB3               If it is less than it is invalid, branch to Invalid    
+000035BC  B23C 0002                641      CMP.B   #2,D1                    Compears the number to 2
+000035C0  6E00 FB38                642      BGT     INVALIDTB3               Branches to Invalid1   
+000035C4                           643  
+000035C4                           644  TBStartFire
+000035C4  43F9 00004824            645      LEA     TbStartFire_msg,A1      Load Front MEssage
+000035CA  103C 000E                646      MOVE.B  #14,D0                  Move 14 into D0 Front Message
+000035CE  4E4F                     647      TRAP    #15                     Display begging message with trap 15
+000035D0                           648      
+000035D0  103C 0004                649      MOVE.B  #4,D0                   Place 4 for trap to call
+000035D4  4E4F                     650      TRAP    #15                     User Input number
+000035D6  B2BC 00000001            651      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+000035DC  6700 0052                652      BEQ     TBRetreat               If 1 was selected branch to
+000035E0                           653     
+000035E0  B2BC 00000002            654      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+000035E6  6700 0074                655      BEQ     TBThrone                If 2 was input branch to
+000035EA                           656      
+000035EA  B23C 0001                657      CMP.B   #1,D1                    Compears D1 to 1
+000035EE  6D00 FB1A                658      BLT     INVALIDTB4               If it is less than it is invalid, branch to Invalid    
+000035F2  B23C 0002                659      CMP.B   #2,D1                    Compears the number to 2
+000035F6  6E00 FB12                660      BGT     INVALIDTB4               Branches to Invalid1  
+000035FA                           661  
+000035FA                           662  
+000035FA                           663  TBConfront
+000035FA  43F9 00004923            664      LEA     TbSoldiers_msg,A1      Load Front MEssage
+00003600  103C 000E                665      MOVE.B  #14,D0                  Move 14 into D0 Front Message
+00003604  4E4F                     666      TRAP    #15                     Display begging message with trap 15
+00003606                           667      
+00003606  103C 0004                668      MOVE.B  #4,D0                   Place 4 for trap to call
+0000360A  4E4F                     669      TRAP    #15                     User Input number
+0000360C  B2BC 00000001            670      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+00003612  6700 001C                671      BEQ     TBRetreat               If 1 was selected branch to
+00003616                           672     
+00003616  B2BC 00000002            673      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+0000361C  6700 003E                674      BEQ     TBThrone                If 2 was input branch to
+00003620                           675      
+00003620  B23C 0001                676      CMP.B   #1,D1                    Compears D1 to 1
+00003624  6D00 FAF4                677      BLT     INVALIDTB5               If it is less than it is invalid, branch to Invalid    
+00003628  B23C 0002                678      CMP.B   #2,D1                    Compears the number to 2
+0000362C  6E00 FAEC                679      BGT     INVALIDTB5               Branches to Invalid1 
+00003630                           680  
+00003630                           681  TBRetreat
+00003630  43F9 00004B2C            682      LEA     TbRetreat_msg,A1      Load Front MEssage
+00003636  103C 000E                683      MOVE.B  #14,D0                  Move 14 into D0 Front Message
+0000363A  4E4F                     684      TRAP    #15                     Display begging message with trap 15
+0000363C                           685      
+0000363C  103C 0004                686      MOVE.B  #4,D0                   Place 4 for trap to call
+00003640  4E4F                     687      TRAP    #15                     User Input number
+00003642  B2BC 00000001            688      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+00003648  6700 F9B6                689      BEQ     NEWGAME               If 1 was selected branch to
+0000364C                           690      
+0000364C  B23C 0001                691      CMP.B   #1,D1                    Compears D1 to 1
+00003650  6D00 FAD8                692      BLT     INVALIDTB6               If it is less than it is invalid, branch to Invalid    
+00003654  B23C 0002                693      CMP.B   #2,D1                    Compears the number to 2
+00003658  6E00 FAD0                694      BGT     INVALIDTB6               Branches to Invalid1 
+0000365C                           695  
+0000365C                           696  
+0000365C                           697  TBThrone
+0000365C  43F9 00004A2D            698      LEA     TbThrone_msg,A1         Load Front MEssage
+00003662  103C 000E                699      MOVE.B  #14,D0                  Move 14 into D0 Front Message
+00003666  4E4F                     700      TRAP    #15                     Display begging message with trap 15
+00003668                           701      
+00003668  103C 0004                702      MOVE.B  #4,D0                   Place 4 for trap to call
+0000366C  4E4F                     703      TRAP    #15                     User Input number
+0000366E  B2BC 00000001            704      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+00003674  6700 001C                705      BEQ     TbHeavy                 If 1 was selected branch to
+00003678                           706      
+00003678  B2BC 00000002            707      CMP.L   #2,D1                   Compear the number 2 to the number in D1
+0000367E  6700 003E                708      BEQ     TbSmall                 If 2 was input branch to  
+00003682                           709  
+00003682  B23C 0001                710      CMP.B   #1,D1                    Compears D1 to 1
+00003686  6D00 FAB2                711      BLT     INVALIDTB7               If it is less than it is invalid, branch to Invalid    
+0000368A  B23C 0002                712      CMP.B   #2,D1                    Compears the number to 2
+0000368E  6E00 FAAA                713      BGT     INVALIDTB7               Branches to Invalid1 
+00003692                           714  
+00003692                           715  TBHeavy
+00003692  43F9 00004C5E            716      LEA     TbHeavy_msg,A1          Load Front MEssage
+00003698  103C 000E                717      MOVE.B  #14,D0                  Move 14 into D0 Front Message
+0000369C  4E4F                     718      TRAP    #15                     Display begging message with trap 15
+0000369E                           719      
+0000369E  103C 0004                720      MOVE.B  #4,D0                   Place 4 for trap to call
+000036A2  4E4F                     721      TRAP    #15                     User Input number
+000036A4  B2BC 00000001            722      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+000036AA  6700 F954                723      BEQ     NEWGAME                 If 1 was selected branch to 
+000036AE                           724      
+000036AE  B23C 0001                725      CMP.B   #1,D1                    Compears D1 to 1
+000036B2  6D00 FA96                726      BLT     INVALIDTB8               If it is less than it is invalid, branch to Invalid    
+000036B6  B23C 0001                727      CMP.B   #1,D1                    Compears the number to 2
+000036BA  6E00 FA8E                728      BGT     INVALIDTB8               Branches to Invalid1
+000036BE                           729  
+000036BE                           730  TBSmall
+000036BE  43F9 00004D75            731      LEA     TbFast_msg,A1           Load Front MEssage
+000036C4  103C 000E                732      MOVE.B  #14,D0                  Move 14 into D0 Front Message
+000036C8  4E4F                     733      TRAP    #15                     Display begging message with trap 15
+000036CA                           734      
+000036CA  103C 0004                735      MOVE.B  #4,D0                   Place 4 for trap to call
+000036CE  4E4F                     736      TRAP    #15                     User Input number
+000036D0  B2BC 00000001            737      CMP.L   #1,D1                   Compear the number 1 to the number in D1
+000036D6  6700 F928                738      BEQ     NEWGAME                 If 1 was selected branch to
+000036DA                           739      
+000036DA  B23C 0001                740      CMP.B   #1,D1                    Compears D1 to 1
+000036DE  6D00 FA7A                741      BLT     INVALIDTB9               If it is less than it is invalid, branch to Invalid    
+000036E2  B23C 0001                742      CMP.B   #1,D1                    Compears the number to 2
+000036E6  6E00 FA72                743      BGT     INVALIDTB9               Branches to Invalid1
+000036EA                           744   
+000036EA                           745      
+000036EA                           746  *-------------------------------------------------------
+000036EA                           747  *-------------------Data Delarations--------------------
+000036EA                           748  *-------------------------------------------------------
+000036EA                           749  
+000036EA= 0D 0A 00                 750  crlf:           dc.b    $0D,$0A,0
+000036ED= 2A 2A 2A 2A 2A 2A ...    751  welcome_msg:    dc.b    '************************************************************'
+00003729= 0D 0A                    752                  dc.b    $0D,$0A
+0000372B= 5A 6F 72 6B 51 75 ...    753                  dc.b    'ZorkQuest: Assault on Egreth Castle'
+0000374E= 0D 0A                    754                  dc.b    $0D,$0A
+00003750= 2A 2A 2A 2A 2A 2A ...    755                  dc.b    '************************************************************'
+0000378C= 0D 0A 00                 756                  dc.b    $0D,$0A,0
+0000378F= 46 65 65 64 20 6C ...    757  feed_msg:       dc.b    'Feed load (each horse needs at least 100 units of feed)'
+000037C6= 0D 0A                    758                  dc.b    $0D,$0A
+000037C8= 45 6E 74 65 72 20 ...    759                  dc.b    'Enter feed load : ',0
+000037DB= 4E 75 6D 62 65 72 ...    760  horses_msg:     dc.b    'Number of horses : ',0
+000037EF= 4F 6E 65 20 54 68 ...    761  rate_msg:       dc.b    'One Third[1], Two Thirds[2], Standard Charge[3], ' 
+00003820= 0D 0A                    762                  dc.b    $0D,$0A
+00003822= 46 75 6C 6C 20 43 ...    763                  dc.b    'Full Charge[4], Flank Charge[5] units feed per click'
+00003856= 0D 0A                    764                  dc.b    $0D,$0A
+00003858= 45 6E 74 65 72 20 ...    765                  dc.b    'Enter Speed : ',0
+00003867= 4D 69 73 73 69 6F ...    766  distance_msg:   dc.b    'Mission distance e.g. 40 (with 100 units of feed  '
+00003899= 0D 0A                    767                  dc.b    $0D,$0A
+0000389B= 4F 6E 65 20 54 68 ...    768                  dc.b    'One Third speed 20 units remain for manuvouirs) horses '
+000038D2= 0D 0A                    769                  dc.b    $0D,$0A
+000038D4= 48 6F 72 73 65 73 ...    770                  dc.b    'Horses without feed are lost.'
+000038F1= 0D 0A                    771                  dc.b    $0D,$0A
+000038F3= 45 6E 74 65 72 20 ...    772                  dc.b    'Enter mission distance : ',0
+0000390D= 45 61 63 68 20 68 ...    773  soldiers_msg:       dc.b    'Each horses need at least 1 Knight and an Stable Hand'
+00003942= 0D 0A                    774                  dc.b    $0D,$0A
+00003944= 6D 69 6E 69 6D 75 ...    775                  dc.b    'minimum requirement is 2 i.e. Stable Hand x 1 and Knight x 1.'
+00003981= 0D 0A                    776                  dc.b    $0D,$0A
+00003983= 45 6E 74 65 72 20 ...    777                  dc.b    'Enter # of soldiers : ',0
+0000399A= 41 64 64 20 47 61 ...    778  gameplay_msg:   dc.b    'Add Gameplay !',0
+000039A9= 55 70 64 61 74 65 ...    779  update_msg:     dc.b    'Update Gameplay !',0
+000039BB= 44 72 61 77 20 53 ...    780  draw_msg:       dc.b    'Draw Screen !',0
+000039C9= 53 74 72 69 6B 65 ...    781  hit_msg:        dc.b    'Strike!',0
+000039D1= 4D 69 73 73 21 00        782  miss_msg:       dc.b    'Miss!',0
+000039D7= 2E 00                    783  loop_msg:       dc.b    '.',0
+000039D9= 45 6E 74 65 72 20 ...    784  replay_msg:     dc.b    'Enter 0 to Quit any other number to replay : ',0
+00003A07= 53 63 6F 72 65 20 ...    785  hud_msg:        dc.b    'Score : ',0
+00003A10                           786  
+00003A10= 2A 2A 2A 2A 2A 2A ...    787  Opening_msg     dc.b    '***************************************************'
+00003A43= 0D 0A                    788                  dc.b    $0D,$0A
+00003A45= 59 4F 55 52 20 4A ...    789                  dc.b    'YOUR JOURNY BEGINS HERE, WELCOME TO WoW ZORK!!!'
+00003A74= 0D 0A                    790                  dc.b    $0D,$0A
+00003A76= 2A 2A 2A 2A 2A 2A ...    791                  dc.b    '***************************************************'
+00003AA9= 0D 0A                    792                  dc.b    $0D,$0A
+00003AAB= 59 6F 75 20 61 72 ...    793                  dc.b    'You are in the world of Azeroth are fighting for the Alliance,'
+00003AE9= 0D 0A                    794                  dc.b    $0D,$0A
+00003AEB= 79 6F 75 20 6D 75 ...    795                  dc.b    'you must lay seige to the Horde Cities and rid the world of the Evil Horde.'
+00003B36= 0D 0A                    796                  dc.b    $0D,$0A
+00003B38= 54 68 65 72 65 20 ...    797                  dc.b    'There are 2 main cities you must destroy in this land,'
+00003B6E= 0D 0A                    798                  dc.b    $0D,$0A
+00003B70= 31 29 20 4F 67 72 ...    799                  dc.b    '1) Ogrimmer'
+00003B7B= 0D 0A                    800                  dc.b    $0D,$0A
+00003B7D= 32 29 20 54 68 75 ...    801                  dc.b    '2) Thunder Bluff'
+00003B8D= 0D 0A                    802                  dc.b    $0D,$0A
+00003B8F= 57 68 69 63 68 20 ...    803                  dc.b    'Which City do you wish to attempt to seige?'
+00003BBA= 0D 0A 00                 804                  dc.b    $0D,$0A,0
+00003BBD                           805  
+00003BBD                           806  
+00003BBD                           807  
+00003BBD=                          808  Og_msg          dc.b    ''
+00003BBD= 0D 0A                    809                  dc.b    $0D,$0A
+00003BBF= 59 6F 75 20 68 61 ...    810                  dc.b    'You have chosen to attack the city Of the Orcs,'
+00003BEE= 0D 0A                    811                  dc.b    $0D,$0A
+00003BF0= 6F 6E 65 20 6F 66 ...    812                  dc.b    'one of the most formidible forces in azeroth!'
+00003C1D= 0D 0A                    813                  dc.b    $0D,$0A
+00003C1F= 59 6F 75 20 61 6E ...    814                  dc.b    'You and your army travel North to the Orce city,'
+00003C4F= 0D 0A                    815                  dc.b    $0D,$0A
+00003C51= 61 73 20 79 6F 75 ...    816                  dc.b    'as you approach you see the Huge city gates in sight'
+00003C85= 0D 0A                    817                  dc.b    $0D,$0A
+00003C87= 44 6F 20 79 6F 75 ...    818                  dc.b    'Do you wish to'
+00003C95= 0D 0A                    819                  dc.b    $0D,$0A
+00003C97= 43 68 61 72 67 65 ...    820                  dc.b    'Charge the front Gate? (PRESS 1)'
+00003CB7= 0D 0A                    821                  dc.b    $0D,$0A
+00003CB9= 4F 52                    822                  dc.b    'OR' 
+00003CBB= 0D 0A                    823                  dc.b    $0D,$0A
+00003CBD= 41 74 74 61 63 6B ...    824                  dc.b    'Attack from the Side Entrace? (PRESS 2)'
+00003CE4= 0D 0A 00                 825                  dc.b    $0D,$0A,0
+00003CE7                           826                  
+00003CE7=                          827  OgSide_msg      dc.b    ''
+00003CE7= 0D 0A                    828                  dc.b    $0D,$0A
+00003CE9= 59 6F 75 20 61 6E ...    829                  dc.b    'You and your army make your way to the side entrance of the city'
+00003D29= 0D 0A                    830                  dc.b    $0D,$0A
+00003D2B= 59 6F 75 20 73 6F ...    831                  dc.b    'You soldiers prepare for battle as you charge the side of the city'
+00003D6D= 0D 0A                    832                  dc.b    $0D,$0A
+00003D6F= 49 74 20 61 70 70 ...    833                  dc.b    'It appears to be Only manned by 2 guards'
+00003D97= 0D 0A                    834                  dc.b    $0D,$0A
+00003D99= 59 6F 75 20 66 69 ...    835                  dc.b    'You fight your way passed them but the alarm has been sounded'
+00003DD6= 0D 0A                    836                  dc.b    $0D,$0A
+00003DD8= 44 6F 20 79 6F 75 ...    837                  dc.b    'Do you wish to'
+00003DE6= 0D 0A                    838                  dc.b    $0D,$0A
+00003DE8= 43 68 61 72 67 65 ...    839                  dc.b    'Charge for the Throne Room (PRESS 1)'
+00003E0C= 0D 0A                    840                  dc.b    $0D,$0A
+00003E0E= 4F 52                    841                  dc.b    'OR' 
+00003E10= 0D 0A                    842                  dc.b    $0D,$0A
+00003E12= 41 74 74 61 63 6B ...    843                  dc.b    'Attack The Soliders who are the imediate Threat? (PRESS 2)'
+00003E4C= 0D 0A 00                 844                  dc.b    $0D,$0A,0
+00003E4F                           845                  
+00003E4F=                          846  OgMain_msg      dc.b    ''
+00003E4F= 0D 0A                    847                  dc.b    $0D,$0A
+00003E51= 59 6F 75 20 61 6E ...    848                  dc.b    'You and your army make your way to the Front Gate of city'
+00003E8A= 0D 0A                    849                  dc.b    $0D,$0A
+00003E8C= 59 6F 75 20 43 68 ...    850                  dc.b    'You Charge to the Front gate and Smash the Gate Entrance to the city'
+00003ED0= 0D 0A                    851                  dc.b    $0D,$0A
+00003ED2= 53 6C 61 79 69 6E ...    852                  dc.b    'Slaying Orcs as your enter the city'
+00003EF5= 0D 0A                    853                  dc.b    $0D,$0A
+00003EF7= 42 75 74 20 74 68 ...    854                  dc.b    'But this noise has alerted the enemy'
+00003F1B= 0D 0A                    855                  dc.b    $0D,$0A
+00003F1D= 44 6F 20 79 6F 75 ...    856                  dc.b    'Do you wish to'
+00003F2B= 0D 0A                    857                  dc.b    $0D,$0A
+00003F2D= 43 68 61 72 67 65 ...    858                  dc.b    'Charge for the Throne Room (PRESS 1)'
+00003F51= 0D 0A                    859                  dc.b    $0D,$0A
+00003F53= 4F 52                    860                  dc.b    'OR' 
+00003F55= 0D 0A                    861                  dc.b    $0D,$0A
+00003F57= 41 74 74 61 63 6B ...    862                  dc.b    'Attack The Soliders who are the Approaching? (PRESS 2)'
+00003F8D= 0D 0A 00                 863                  dc.b    $0D,$0A,0
+00003F90                           864                  
+00003F90=                          865  OgSoldiers_msg   dc.b    ''
+00003F90= 0D 0A                    866                  dc.b    $0D,$0A
+00003F92= 59 6F 75 72 20 73 ...    867                  dc.b    'Your soldiers clash with the orcs in a blood bath'
+00003FC3= 0D 0A                    868                  dc.b    $0D,$0A
+00003FC5= 59 6F 75 72 20 66 ...    869                  dc.b    'Your forces overcome the orc army, though their was injurys'
+00004000= 0D 0A                    870                  dc.b    $0D,$0A
+00004002= 44 6F 20 79 6F 75 ...    871                  dc.b    'Do you wish to, tend to the wonded and then proceed to the throne room? (Enter 1)'
+00004053= 0D 0A                    872                  dc.b    $0D,$0A
+00004055= 4F 52                    873                  dc.b    'OR'
+00004057= 0D 0A                    874                  dc.b    $0D,$0A
+00004059= 53 70 72 69 6E 74 ...    875                  dc.b    'Sprint to the Throne Room (Enter 2)'
+0000407C= 0D 0A 00                 876                  dc.b    $0D,$0A,0    
+0000407F                           877  
+0000407F=                          878  OgThrone_msg     dc.b    ''
+0000407F= 0D 0A                    879                  dc.b    $0D,$0A
+00004081= 57 68 65 6E 20 79 ...    880                  dc.b    'When you get to the Throne Room you are finally confronted by the War Cheif'
+000040CC= 0D 0A                    881                  dc.b    $0D,$0A
+000040CE= 48 65 20 62 61 72 ...    882                  dc.b    'He bares his teeth at you and spits at you as he swings his mace'
+0000410E= 0D 0A                    883                  dc.b    $0D,$0A
+00004110= 44 6F 20 79 6F 75 ...    884                  dc.b    'Do you wish to, Use the brute force of your Mace? (Enter 1)'
+0000414B= 0D 0A                    885                  dc.b    $0D,$0A
+0000414D= 4F 52                    886                  dc.b    'OR'
+0000414F= 0D 0A                    887                  dc.b    $0D,$0A
+00004151= 55 73 65 20 74 68 ...    888                  dc.b    'Use the speed of your sword?(Enter 2)'
+00004176= 0D 0A 00                 889                  dc.b    $0D,$0A,0  
+00004179                           890  
+00004179=                          891  OgHeavyAttack_msg dc.b    ''
+00004179= 0D 0A                    892                    dc.b    $0D,$0A
+0000417B= 57 69 74 68 20 61 ...    893                    dc.b    'With a Heavy well timed attack you swing your mace down upon the Warcheifs head'
+000041CA= 0D 0A                    894                  dc.b    $0D,$0A
+000041CC= 4B 69 6C 6C 69 6E ...    895                  dc.b    'Killing Him in an instant! Any remaing enemy orcs imediatly flee'
+0000420C= 0D 0A                    896                  dc.b    $0D,$0A
+0000420E= 2A 2A 2A 2A 2A 2A ...    897                  dc.b    '********************************************'
+0000423A= 0D 0A                    898                  dc.b    $0D,$0A
+0000423C= 43 4F 4E 47 52 41 ...    899                  dc.b    'CONGRATULATIONS YOU HAVE CONQUERED OGRIMMAR!'
+00004268= 0D 0A                    900                  dc.b    $0D,$0A
+0000426A= 2A 2A 2A 2A 2A 2A ...    901                  dc.b    '********************************************'
+00004296= 0D 0A                    902                  dc.b    $0D,$0A
+00004298= 50 72 65 73 73 20 ...    903                  dc.b    'Press 1 to select which City you wish to attack next'
+000042CC= 0D 0A 00                 904                  dc.b    $0D,$0A,0 
+000042CF                           905                  
+000042CF=                          906  OgFastAttack_msg    dc.b    ''
+000042CF= 0D 0A                    907                  dc.b    $0D,$0A
+000042D1= 59 6F 75 20 62 61 ...    908                  dc.b    'You battle with the skilled warcheif for several minutes'
+00004309= 0D 0A                    909                  dc.b    $0D,$0A
+0000430B= 42 75 74 20 68 61 ...    910                  dc.b    'But having your skill with a blade you take your opertunity and'
+0000434A= 0D 0A                    911                  dc.b    $0D,$0A
+0000434C= 67 65 74 20 74 68 ...    912                  dc.b    'get the upper hand on him stabbing him in the side, he falls to the floor'
+00004395= 0D 0A                    913                  dc.b    $0D,$0A
+00004397= 44 6F 20 79 6F 75 ...    914                  dc.b    'Do you wish to spare him? (Press 1)'
+000043BA= 0D 0A                    915                  dc.b    $0D,$0A
+000043BC= 4F 52                    916                  dc.b    'OR'
+000043BE= 0D 0A                    917                  dc.b    $0D,$0A
+000043C0= 4B 69 6C 6C 20 68 ...    918                  dc.b    'Kill him? (Press 2)'
+000043D3= 0D 0A 00                 919                  dc.b    $0D,$0A,0 
+000043D6                           920                  
+000043D6=                          921  OgSpare_msg     dc.b    ''
+000043D6= 0D 0A                    922                  dc.b    $0D,$0A
+000043D8= 59 6F 75 20 50 69 ...    923                  dc.b    'You Pick the Warchief Up and throw him outside the city'
+0000440F= 0D 0A                    924                  dc.b    $0D,$0A
+00004411= 48 65 20 69 73 20 ...    925                  dc.b    'He is picked up by a couple of his comrades'
+0000443C= 0D 0A                    926                  dc.b    $0D,$0A
+0000443E= 2A 2A 2A 2A 2A 2A ...    927                  dc.b    '********************************************'
+0000446A= 0D 0A                    928                  dc.b    $0D,$0A
+0000446C= 43 4F 4E 47 52 41 ...    929                  dc.b    'CONGRATULATIONS YOU HAVE CONQUERED OGRIMMAR'
+00004497= 0D 0A                    930                  dc.b    $0D,$0A
+00004499= 2A 2A 2A 2A 2A 2A ...    931                  dc.b    '********************************************'
+000044C5= 0D 0A                    932                  dc.b    $0D,$0A
+000044C7= 50 72 65 73 73 20 ...    933                  dc.b    'Press 1 to select which City you wish to attack next'
+000044FB= 0D 0A 00                 934                  dc.b    $0D,$0A,0
+000044FE                           935                  
+000044FE=                          936  OgKill_msg      dc.b    ''
+000044FE= 0D 0A                    937                  dc.b    $0D,$0A
+00004500= 59 6F 75 20 73 69 ...    938                  dc.b    'You sink your blade into the warcheif and the battle is over'
+0000453C= 0D 0A                    939                  dc.b    $0D,$0A
+0000453E= 41 6E 79 20 6F 66 ...    940                  dc.b    'Any of his comrades run in fear as you have slane their warcheif'
+0000457E= 0D 0A                    941                  dc.b    $0D,$0A
+00004580= 2A 2A 2A 2A 2A 2A ...    942                  dc.b    '********************************************'
+000045AC= 0D 0A                    943                  dc.b    $0D,$0A
+000045AE= 43 4F 4E 47 52 41 ...    944                  dc.b    'CONGRATULATIONS YOU HAVE CONQUERED OGRIMMAR'
+000045D9= 0D 0A                    945                  dc.b    $0D,$0A
+000045DB= 2A 2A 2A 2A 2A 2A ...    946                  dc.b    '********************************************'
+00004607= 0D 0A                    947                  dc.b    $0D,$0A
+00004609= 50 72 65 73 73 20 ...    948                  dc.b    'Press 1 to select which City you wish to attack next'
+0000463D= 0D 0A 00                 949                  dc.b    $0D,$0A,0
+00004640                           950       
+00004640=                          951  TbFront_msg     dc.b    ''
+00004640= 0D 0A                    952                  dc.b    $0D,$0A
+00004642= 59 6F 75 20 63 68 ...    953                  dc.b   'You charge the front gates but are seen by the Tauren Warriors'
+00004680= 0D 0A                    954                  dc.b    $0D,$0A
+00004682= 54 68 65 20 41 6C ...    955                  dc.b    'The Alarm has been sounded as you enter the village'
+000046B5= 0D 0A                    956                  dc.b    $0D,$0A
+000046B7= 44 6F 20 79 6F 75 ...    957                  dc.b    'Do you wish to'
+000046C5= 0D 0A                    958                  dc.b    $0D,$0A
+000046C7= 53 65 74 20 46 69 ...    959                  dc.b    'Set Fire to the Buildings inside the village (Press 1)'
+000046FD= 0D 0A                    960                  dc.b    $0D,$0A
+000046FF= 4F 52                    961                  dc.b    'OR'
+00004701= 0D 0A                    962                  dc.b    $0D,$0A
+00004703= 41 74 74 61 63 6B ...    963                  dc.b    'Attack the Soldires Head on (Press 2)'
+00004728= 0D 0A 00                 964                  dc.b    $0D,$0A,0
+0000472B                           965                  
+0000472B= 59 6F 75 72 20 61 ...    966  TbBack_msg      dc.b    'Your army approaches from the back of the Village giving you the element of suprise'
+0000477E= 0D 0A                    967                  dc.b    $0D,$0A
+00004780= 44 6F 20 79 6F 75 ...    968                  dc.b    'Do you want to take advantage of this by'
+000047A8= 0D 0A                    969                  dc.b    $0D,$0A
+000047AA= 53 74 61 72 74 69 ...    970                  dc.b    'Starting a Fire in the village (Press 1)'
+000047D2= 0D 0A                    971                  dc.b    $0D,$0A
+000047D4= 4F 52                    972                  dc.b    'OR'
+000047D6= 0D 0A                    973                  dc.b    $0D,$0A
+000047D8= 53 75 70 72 69 73 ...    974                  dc.b    'Suprise attack the enemy Soldiers who have not yet detected you (Press 2)'
+00004821= 0D 0A 00                 975                  dc.b    $0D,$0A,0
+00004824                           976                  
+00004824=                          977  TbStartFire_msg dc.b    ''
+00004824= 0D 0A                    978                  dc.b    $0D,$0A
+00004826= 59 6F 75 20 54 68 ...    979                  dc.b    'You Throw a fire torch on the villages thatched roofs'
+0000485B= 0D 0A                    980                  dc.b    $0D,$0A
+0000485D= 54 68 65 20 56 69 ...    981                  dc.b    'The Village starts to burn as the fire spreads from house to house'
+0000489F= 0D 0A                    982                  dc.b    $0D,$0A
+000048A1= 44 6F 20 79 6F 75 ...    983                  dc.b    'Do you want to'
+000048AF= 0D 0A                    984                  dc.b    $0D,$0A
+000048B1= 53 74 65 61 6C 20 ...    985                  dc.b    'Steal The enemys Supplys and leave the village to burn?(Press 1)'
+000048F1= 0D 0A                    986                  dc.b    $0D,$0A
+000048F3= 4F 52                    987                  dc.b    'OR'
+000048F5= 0D 0A                    988                  dc.b    $0D,$0A
+000048F7= 41 74 74 61 63 6B ...    989                  dc.b    'Attack the Leader of the Tauren (Press 2)'
+00004920= 0D 0A 00                 990                  dc.b    $0D,$0A,0
+00004923                           991                  
+00004923=                          992  TbSoldiers_msg  dc.b    ''
+00004923= 0D 0A                    993                  dc.b    $0D,$0A
+00004925= 59 6F 75 20 43 68 ...    994                  dc.b    'You Charge Towards the enemy warriors'
+0000494A= 0D 0A                    995                  dc.b    $0D,$0A
+0000494C= 59 6F 75 20 63 6C ...    996                  dc.b    'You clash in a mightly bloodbath'
+0000496C= 0D 0A                    997                  dc.b    $0D,$0A
+0000496E= 59 6F 75 20 65 76 ...    998                  dc.b    'You eventuall kill the last of the guards on the watch'
+000049A4= 0D 0A                    999                  dc.b    $0D,$0A
+000049A6= 44 6F 20 79 6F 75 ...   1000                  dc.b    'Do you want to'
+000049B4= 0D 0A                   1001                  dc.b    $0D,$0A
+000049B6= 53 74 65 61 6C 20 ...   1002                  dc.b    'Steal the supplys and reteat (Press 1)'
+000049DC= 0D 0A                   1003                  dc.b    $0D,$0A
+000049DE= 4F 52 20                1004                  dc.b    'OR '
+000049E1= 0D 0A                   1005                  dc.b    $0D,$0A
+000049E3= 41 74 74 61 63 6B ...   1006                  dc.b    'Attack the leader of the Tauren in the Main Village Building (Press 2) '
+00004A2A= 0D 0A 00                1007                  dc.b    $0D,$0A,0
+00004A2D                          1008                  
+00004A2D=                         1009  TbThrone_msg  dc.b    ''
+00004A2D= 0D 0A                   1010                  dc.b    $0D,$0A
+00004A2F= 59 6F 75 20 45 6E ...   1011                  dc.b    'You Enter the main Building of the village and the Leader of the Tauren is there.'
+00004A80= 0D 0A                   1012                  dc.b    $0D,$0A
+00004A82= 48 65 20 69 73 20 ...   1013                  dc.b    'He is a monsterous size nealy twice as big as your biggest soldier'
+00004AC4= 0D 0A                   1014                  dc.b    $0D,$0A
+00004AC6= 44 6F 20 79 6F 75 ...   1015                  dc.b    'Do you wish to'
+00004AD4= 0D 0A                   1016                  dc.b    $0D,$0A
+00004AD6= 41 74 74 61 63 6B ...   1017                  dc.b    'Attack Him with your heavy Mace (Press 1)'
+00004AFF= 0D 0A                   1018                  dc.b    $0D,$0A
+00004B01= 4F 52                   1019                  dc.b    'OR'
+00004B03= 0D 0A                   1020                  dc.b    $0D,$0A
+00004B05= 41 74 74 61 63 6B ...   1021                  dc.b    'Attack him with your sword (Press 2)'
+00004B29= 0D 0A 00                1022                  dc.b    $0D,$0A,0
+00004B2C                          1023  
+00004B2C=                         1024  TbRetreat_msg  dc.b    ''
+00004B2C= 0D 0A                   1025                  dc.b    $0D,$0A
+00004B2E= 59 6F 75 20 67 72 ...   1026                  dc.b    'You grab the supplys and Reatreat away from the village'
+00004B65= 0D 0A                   1027                  dc.b    $0D,$0A
+00004B67= 54 68 65 20 76 69 ...   1028                  dc.b    'The village will post no threat to the kingdom of Azeroth now'
+00004BA4= 0D 0A                   1029                  dc.b    $0D,$0A
+00004BA6= 2A 2A 2A 2A 2A 2A ...   1030                  dc.b    '*******************************************'
+00004BD1= 0D 0A                   1031                  dc.b    $0D,$0A
+00004BD3= 59 4F 55 20 48 41 ...   1032                  dc.b    'YOU HAVE SUCCESSFULLY DEFEATED THUNDER BLUFF'
+00004BFF= 0D 0A                   1033                  dc.b    $0D,$0A
+00004C01= 2A 2A 2A 2A 2A 2A ...   1034                  dc.b    '*******************************************'
+00004C2C= 50 72 65 73 73 20 ...   1035                  dc.b    'Press 1 to select Where you want to invade next'
+00004C5B= 0D 0A 00                1036                  dc.b    $0D,$0A,0
+00004C5E                          1037                  
+00004C5E= 59 6F 75 20 53 77 ...   1038  TbHeavy_msg     dc.b    'You Swing Your mace and with one final attack you kill the Tauren Cheif by crushing his skull'
+00004CBB= 0D 0A                   1039                  dc.b    $0D,$0A
+00004CBD= 2A 2A 2A 2A 2A 2A ...   1040                  dc.b    '*******************************************'
+00004CE8= 0D 0A                   1041                  dc.b    $0D,$0A
+00004CEA= 59 4F 55 20 48 41 ...   1042                  dc.b    'YOU HAVE SUCCESSFULLY DEFEATED THUNDER BLUFF'
+00004D16= 0D 0A                   1043                  dc.b    $0D,$0A
+00004D18= 2A 2A 2A 2A 2A 2A ...   1044                  dc.b    '*******************************************'
+00004D43= 50 72 65 73 73 20 ...   1045                  dc.b    'Press 1 to select Where you want to invade next'
+00004D72= 0D 0A 00                1046                  dc.b    $0D,$0A,0
+00004D75                          1047                  
+00004D75= 57 69 74 68 20 79 ...   1048  TbFast_msg      dc.b    'With your skillful precision you strike the Tauren cheif with a quick stabbing motion and pierce his heart'
+00004DDF= 0D 0A                   1049                  dc.b    $0D,$0A
+00004DE1= 2A 2A 2A 2A 2A 2A ...   1050                  dc.b    '*******************************************'
+00004E0C= 0D 0A                   1051                  dc.b    $0D,$0A
+00004E0E= 59 4F 55 20 48 41 ...   1052                  dc.b    'YOU HAVE SUCCESSFULLY DEFEATED THUNDER BLUFF'
+00004E3A= 0D 0A                   1053                  dc.b    $0D,$0A
+00004E3C= 2A 2A 2A 2A 2A 2A ...   1054                  dc.b    '*******************************************'
+00004E67= 50 72 65 73 73 20 ...   1055                  dc.b    'Press 1 to select Where you want to invade next'
+00004E96                          1056  
+00004E96                          1057                  
+00004E96=                         1058  TB_msg          dc.b    ''
+00004E96= 0D 0A                   1059                  dc.b    $0D,$0A
+00004E98= 59 6F 75 20 68 61 ...   1060                  dc.b    'You have chosen to face the mighty Tauren who dwell in Thunder Bluff'
+00004EDC= 0D 0A                   1061                  dc.b    $0D,$0A
+00004EDE= 59 6F 75 20 54 72 ...   1062                  dc.b    'You Travel West towards the Mountain village they live in'
+00004F17= 0D 0A                   1063                  dc.b    $0D,$0A
+00004F19= 41 73 20 79 6F 75 ...   1064                  dc.b    'As you get closer to the village will you'
+00004F42= 0D 0A                   1065                  dc.b    $0D,$0A
+00004F44= 41 74 61 63 6B 20 ...   1066                  dc.b    'Atack from the front? (Press 1)'
+00004F63= 0D 0A                   1067                  dc.b    $0D,$0A
+00004F65= 4F 52                   1068                  dc.b    'OR'
+00004F67= 41 74 74 61 63 6B ...   1069                  dc.b    'Attack from the Back (Press 2)'
+00004F85= 0D 0A 00                1070                  dc.b    $0D,$0A,0
+00004F88                          1071                  
+00004F88                          1072                  
+00004F88= 0D 0A                   1073  UC_msg          dc.b    $0D,$0A
+00004F8A=                         1074                  dc.b    ''
+00004F8A= 57 65 6C 63 6F 6D ...   1075                  dc.b    'Welcome to Under City'
+00004F9F= 0D 0A 00                1076                  dc.b    $0D,$0A,0
+00004FA2                          1077                  
+00004FA2= 57 65 6C 63 6F 6D ...   1078  SM_msg          dc.b    'Welcome to SilverMoon'
+00004FB7= 0D 0A 00                1079                  dc.b     $0D,$0A,0
+00004FBA                          1080  
+00004FBA=                         1081  INV             dc.b ''
+00004FBA= 0D 0A                   1082                  dc.b    $0D,$0A
+00004FBC= 21 21 21 57 41 52 ...   1083                  dc.b '!!!WARNING!!! That Number is Invalid Please enter a Valid Number'
+00004FFC= 0D 0A                   1084                  dc.b    $0D,$0A
+00004FFE= 0D 0A 00                1085                  dc.b    $0D,$0A,0
+00005001                          1086                  
+00005001                          1087  
+00005002                          1088  health:     ds.w    1
+00005004                          1089  score:      ds.w    1 reserve space for score
+00005006                          1090  
+00005006                          1091      end start
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CLEAR_SCREEN        331A
+COLLISION           32C0
+COLLISION_HIT       32CC
+COLLISION_MISS      32DA
+CRLF                36EA
+DECORATE            32FC
+DISTANCE            324C
+DISTANCE_MSG        3867
+DRAW                31E4
+DRAW_MSG            39BB
+END                 3170
+ENDL                3348
+EXIT                0
+FEED                31FE
+FEED_MSG            378F
+GAME                316A
+GAMELOOP            31A0
+GAMEPLAY            3280
+GAMEPLAY_MSG        399A
+HEALTH              5002
+HIT_MSG             39C9
+HIT_POINT           5
+HORSES              3218
+HORSES_MSG          37DB
+HUD                 329E
+HUD_MSG             3A07
+INPUT               318A
+INV                 4FBA
+INVALID             303C
+INVALIDOG1          304A
+INVALIDOG2          305A
+INVALIDOG3          306A
+INVALIDOG4          307A
+INVALIDOG5          308A
+INVALIDOG6          309A
+INVALIDOG7          30AA
+INVALIDOG8          30BA
+INVALIDOG9          30CA
+INVALIDTB1          30DA
+INVALIDTB2          30EA
+INVALIDTB3          30FA
+INVALIDTB4          310A
+INVALIDTB5          311A
+INVALIDTB6          312A
+INVALIDTB7          313A
+INVALIDTB8          314A
+INVALIDTB9          315A
+LOOP                32E8
+LOOP_MSG            39D7
+MAX_CHARGE          5
+MAX_HORSES          9
+MINE_LOC            64
+MIN_CHARGE          1
+MIN_FEED            64
+MIN_HORSES          1
+MIN_SOLDIER         6
+MISS_MSG            39D1
+MISS_POINT          8
+NEWGAME             3000
+NEXT                32EC
+OGBEGINNING         335E
+OGFASTATTACK        3494
+OGFASTATTACK_MSG    42CF
+OGHEAVYATTACK       3468
+OGHEAVYATTACK_MSG   4179
+OGKILL              34F6
+OGKILL_MSG          44FE
+OGMAINGATE          33CA
+OGMAIN_MSG          3E4F
+OGSIDEENTRANCE      3394
+OGSIDE_MSG          3CE7
+OGSOLDIERS          3436
+OGSOLDIERS_MSG      3F90
+OGSPARE             34CA
+OGSPARE_MSG         43D6
+OGTHRONEROOM        3400
+OGTHRONE_MSG        407F
+OG_MSG              3BBD
+OPENING_MSG         3A10
+OUT                 3304
+RATE                3232
+RATE_MSG            37EF
+REPLAY              3326
+REPLAY_MSG          39D9
+SCORE               5004
+SM_MSG              4FA2
+SOLDIERS            3266
+SOLDIERS_MSG        390D
+START               1000
+TBBACK              358E
+TBBACK_MSG          472B
+TBBEGINNING         3522
+TBCONFRONT          35FA
+TBFAST_MSG          4D75
+TBFRONT             3558
+TBFRONT_MSG         4640
+TBHEAVY             3692
+TBHEAVY_MSG         4C5E
+TBRETREAT           3630
+TBRETREAT_MSG       4B2C
+TBSMALL             36BE
+TBSOLDIERS_MSG      4923
+TBSTARTFIRE         35C4
+TBSTARTFIRE_MSG     4824
+TBTHRONE            365C
+TBTHRONE_MSG        4A2D
+TB_MSG              4E96
+UC_MSG              4F88
+UPDATE              31CA
+UPDATE_MSG          39A9
+WELCOME             3174
+WELCOME_MSG         36ED
